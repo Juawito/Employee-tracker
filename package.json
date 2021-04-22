@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "inquirer": "^8.0.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.7"
+  }
+}
