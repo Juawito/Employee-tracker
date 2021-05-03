@@ -11,7 +11,8 @@ CREATE TABLE employee (
     role_id INT NOT NULL,
     manager_id INT,
     PRIMARY KEY (id),
-    FOREIGN KEY (role_id) REFERENCES emp_role(id)
+    CONSTRAINT fk_empRole
+    FOREIGN KEY(role_id) REFERENCES emp_role(id)
 );
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ('Lerantino', 'Johnson', 1, );
+INSERT INTO employee (first_name, last_name, role_id)
+VALUES ('Lerantino', 'Johnson', 1 );

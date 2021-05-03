@@ -5,9 +5,10 @@ CREATE TABLE emp_role (
     title VARCHAR(30) NOT NULL,
     salary DECIMAL NOT NULL,
     department_id INT NOT NULL,
-    FOREIGN KEY (department_id)  REFERENCES department(id),
-    PRIMARY KEY (id)
+    CONSTRAINT fk_departmentId
+    FOREIGN KEY(department_id)  REFERENCES department(id),
+    PRIMARY KEY(id)
 );
 
 INSERT INTO emp_role (title, salary, department_id)
-VALUES ('Lead HR', 55000, 'Human Resources');
+VALUES ('Lead HR', 55000, 1);
