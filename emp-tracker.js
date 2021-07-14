@@ -58,6 +58,7 @@ const search = () => {
                     askAgain();
                     break;
                 case 'Employee':
+                    query = 'SELECT * FROM employee WHERE employee.first_name = ? AND employee.last_name = ?'
                     inquirer.prompt([
                         {
                             name: 'empFirst',
@@ -71,11 +72,12 @@ const search = () => {
                         }
                     ])
                         .then((res) => {
-                            connection.query('SELECT * FROM employee WHERE ?',
-                                {
-                                    first_name: res.empFirst,
-                                    last_name: res.empLast
-                                }, (err, result) => {
+                            console.log(res)
+                            connection.query(query,
+                                [
+                                    res.empFirst,
+                                    res.empLast
+                                ], (err, result) => {
                                     if (err) throw err;
                                     console.table(result);
                                     askAgain();
@@ -83,14 +85,14 @@ const search = () => {
                         })
                     break;
                 case 'Department':
-                    query = 'SELECT * FROM department WHERE department.name = ?'
+                    query = 'SELECT * FROM department WHERE department.department_name = ?'
                     inquirer.prompt({
                         name: 'depname',
                         type: 'input',
                         message: 'What is the Name of the department that you would like to search for?'
                     })
                         .then((res) => {
-                            connection.query(query, [res.depID], (err, result) => {
+                            connection.query(query, [res.depname], (err, result) => {
                                 if (err) throw err;
                                 console.table(result);
                                 askAgain();
@@ -98,14 +100,14 @@ const search = () => {
                         })
                     break;
                 case 'Role':
-                    query = 'SELECT * FROM role WHERE role.title = ?'
+                    query = 'SELECT * FROM emp_role WHERE emp_role.title = ?'
                     inquirer.prompt({
                         name: 'roleTitle',
                         type: 'input',
                         message: 'What is the Title of the role that you would like to search for?'
                     })
                         .then((res) => {
-                            connection.query(query, [res.roleID], (err, result) => {
+                            connection.query(query, [res.roleTitle], (err, result) => {
                                 if (err) throw err;
                                 console.table(result);
                                 askAgain();
@@ -155,36 +157,47 @@ const addToDB = () => {
                     let query = 'INSERT INTO employee (first_name, last_name, role_id, manager_id) ';
                     inquirer.prompt([
                         {
-                            name: 'firstAndLast',
+                            name: 'first_name',
                             type: 'input',
-                            message: 'What is the first and last name of the employee?'
+                            message: 'What is the first name of the employee?'
                         },
                         {
-                            name: 'roleId',
+                            name: 'last_name',
+                            type: 'input',
+                            message: 'What is the last name of the employee?'
+                        },
+                        {
+                            name: 'role_id',
                             type: 'input',
                             message: 'What is the roleId for the employee?'
                         },
                         {
-                            name: 'managerID',
+                            name: 'manager_id',
                             type: 'input',
                             message: "What is the ID for the employee's manager?"
                         }
                     ])
                         .then((res) => {
-                            query += `VALUES (${res.firstAndLast[0]}, ${res.firstAndLast[1]}, ${res.roleID}, ${res.managerID})`;
-                            connection.query(query, (err, res) => {
-                                console.table(res);
+                            console.log(res);
+                            let query = `INSERT INTO employee SET ?`;
+                            connection.query(query, res,(err, result) => {
+                                if (err) throw err;
+                                console.table(result);
                                 askAgain();
                             })
                         })
                     break;
                 case 'Manager':
-                    query = 'INSERT INTO manager(first_name, last_name, role_id, ) ';
                     inquirer.prompt([
                         {
-                            name: 'firstAndLast',
+                            name: 'first',
                             type: 'input',
-                            message: 'What is the first and last name of the employee?'
+                            message: 'What is the first name of the employee?'
+                        },
+                        {
+                            name: 'last',
+                            type: 'input',
+                            message: 'What is the last name of the employee?'
                         },
                         {
                             name: 'managerID',
@@ -193,7 +206,7 @@ const addToDB = () => {
                         }
                     ])
                         .then((res) => {
-                            query += `VALUES (${res.firstAndLast[0]}, ${res.firstAndLast[1]}, ${res.roleID}, ${res.managerID})`;
+                            query += `VALUES (${res.first}, ${res.last}, ${res.roleID}, ${res.managerID})`;
                             connection.query(query, (err, res) => {
                                 console.table(res);
                                 askAgain();
@@ -201,24 +214,22 @@ const addToDB = () => {
                         })
                     break;
                 case 'Department':
-                    query = 'INSERT INTO department(department_name ) ';
                     inquirer.prompt([
                         {
-                            name: 'depName',
+                            name: 'department_name',
                             type: 'input',
                             message: 'What the name of the New Department?'
                         }
                     ])
                         .then((res) => {
-                            query += `VALUES (${res.depName})`;
-                            connection.query(query, (err, res) => {
-                                console.table(res);
+                            let query = 'INSERT INTO department SET ? ';
+                            connection.query(query, res, (err, result) => {
+                                console.table(result);
                                 askAgain();
                             })
                         })
                     break;
                 case 'Role':
-                    query = 'INSERT INTO emp_role(title, salary, department_id ) ';
                     inquirer.prompt([
                         {
                             name: 'title',
@@ -237,9 +248,9 @@ const addToDB = () => {
                         }
                     ])
                         .then((res) => {
-                            query += `VALUES (${res.title}, ${res.salary}, ${res.department_id})`;
-                            connection.query(query, (err, res) => {
-                                console.table(res);
+                            let query = 'INSERT INTO emp_role SET ?';
+                            connection.query(query, res, (err, result) => {
+                                console.table(result);
                                 askAgain();
                             })
                         })
@@ -269,16 +280,12 @@ const updateDB = () => {
                         .then((res) => {
                             switch (res.updateEmp) {
                                 case 'ROLE':
+                                    allData();
                                     inquirer.prompt([
                                         {
-                                            name: 'firstName',
+                                            name: 'empId',
                                             type: 'input',
-                                            message: 'What is the First name of the Employee?'
-                                        },
-                                        {
-                                            name: 'lastName',
-                                            type: 'input',
-                                            message: 'What is the Last name of the Employee?'
+                                            message: 'What is the Employee ID?'
                                         },
                                         {
                                             name: 'newRole',
@@ -294,8 +301,7 @@ const updateDB = () => {
                                                         role_id: res.newRole,
                                                     },
                                                     {
-                                                        first_name: res.firstName,
-                                                        last_name: res.lastName,
+                                                        id: res.empId,
                                                     },
                                                 ],
                                                 (error) => {
